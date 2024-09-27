@@ -28,20 +28,20 @@ floorColorTexture.wrapT = THREE.RepeatWrapping
 floorColorTexture.colorSpace = THREE.SRGBColorSpace
 
 // Wall Textures
-const wallColorTexture = textureLoader.load('./wall/castle_brick_broken_06_1k/castle_brick_broken_06_diff_1k.jpg')
-const wallARMTexture = textureLoader.load('./wall/castle_brick_broken_06_1k/castle_brick_broken_06_arm_1k.jpg')
-const wallNormalTexture = textureLoader.load('./wall/castle_brick_broken_06_1k/castle_brick_broken_06_nor_gl_1k.jpg')
+const wallColorTexture = textureLoader.load('./wall/castle_brick_01_1k/castle_brick_01_diff_1k.jpg')
+const wallARMTexture = textureLoader.load('./wall/castle_brick_01_1k/castle_brick_01_arm_1k.jpg')
+const wallNormalTexture = textureLoader.load('./wall/castle_brick_01_1k/castle_brick_01_nor_gl_1k.jpg')
 
 wallColorTexture.colorSpace = THREE.SRGBColorSpace
 
 // Roof Textures
-const roofColorTexture = textureLoader.load('./roof/roof_slates_02_1k/roof_slates_02_diff_1k.jpg')
-const roofARMTexture = textureLoader.load('./roof/roof_slates_02_1k/roof_slates_02_arm_1k.jpg')
-const roofNormalTexture = textureLoader.load('./roof/roof_slates_02_1k/roof_slates_02_nor_gl_1k.jpg')
+const roofColorTexture = textureLoader.load('./roof/clay_roof_tiles_03_1k/clay_roof_tiles_03_diff_1k.jpg')
+const roofARMTexture = textureLoader.load('./roof/clay_roof_tiles_03_1k/clay_roof_tiles_03_arm_1k.jpg')
+const roofNormalTexture = textureLoader.load('./roof/clay_roof_tiles_03_1k/clay_roof_tiles_03_nor_gl_1k.jpg')
 
-roofColorTexture.repeat.set(3,1)
-roofARMTexture.repeat.set(3,1)
-roofNormalTexture.repeat.set(3,1)
+roofColorTexture.repeat.set(7,1)
+roofARMTexture.repeat.set(7,1)
+roofNormalTexture.repeat.set(7,1)
 roofColorTexture.wrapS = THREE.RepeatWrapping
 roofARMTexture.wrapS = THREE.RepeatWrapping
 roofNormalTexture.wrapS = THREE.RepeatWrapping
@@ -129,13 +129,13 @@ house.add(walls)
 
 // Roof
 const roof = new THREE.Mesh(
-  new THREE.ConeGeometry(3.5,1.5,4),
+  new THREE.ConeGeometry(3.5,1.5,4, 10,10),
   new THREE.MeshStandardMaterial({
     map: roofColorTexture,
     aoMap: roofARMTexture,
     roughnessMap: roofARMTexture,
     metalnessMap: roofARMTexture,
-    normalMap: roofNormalTexture
+    normalMap: roofNormalTexture,
   })
 )
 roof.position.y = 2.5 + 0.75
@@ -170,6 +170,7 @@ const bushMaterial = new THREE.MeshStandardMaterial({
   roughnessMap: bushARMTexture,
   metalnessMap: bushARMTexture,
   normalMap: bushNormalTexture,
+  color: '#ccffcc'
 })
 
 const bush1 = new THREE.Mesh(bushGeometry, bushMaterial)
@@ -189,7 +190,7 @@ bush3.rotation.x = - 0.75
 
 const bush4 = new THREE.Mesh(bushGeometry, bushMaterial)
 bush4.scale.set(0.15,0.15,0.15)
-bush4.position.set(-1, 0.05, 2.75)
+bush4.position.set(-1.2, 0.05, 2.35)
 bush4.rotation.x = - 0.75
 
 house.add(bush1, bush2, bush3, bush4)
@@ -209,7 +210,7 @@ scene.add(graves)
 
 for(let i = 0; i < 30; i++) {
   const angle = Math.random() * Math.PI * 2
-  const radius = 4 + Math.random() * 4
+  const radius = 4 + Math.random() * 3
   const x = Math.sin(angle) * radius
   const z = Math.cos(angle) * radius
   
@@ -266,13 +267,52 @@ window.addEventListener('resize', () => {
 const camera = new THREE.PerspectiveCamera(45, sizes.width / sizes.height, 0.1, 100)
 camera.position.x = 4
 camera.position.y = 2
-camera.position.z = 10
+camera.position.z = 12
 scene.add(camera)
 
 // Renderer
 const renderer = new THREE.WebGLRenderer({canvas: canvas})
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+// Shadows
+renderer.shadowMap.enabled = true
+renderer.shadowMap.type = THREE.PCFSoftShadowMap
+
+directionalLight.castShadow = true
+ghost1.castShadow = true
+ghost2.castShadow = true
+ghost3.castShadow = true
+walls.castShadow = true
+walls.receiveShadow = true
+roof.castShadow = true
+floor.receiveShadow = true
+
+for(const grave of graves.children) {
+  grave.castShadow = true
+  grave.receiveShadow = true
+}
+
+directionalLight.shadow.mapSize.width = 256
+directionalLight.shadow.mapSize.height = 256
+directionalLight.shadow.camera.top = 8
+directionalLight.shadow.camera.right = 8
+directionalLight.shadow.camera.bottom = - 8
+directionalLight.shadow.camera.left = - 8
+directionalLight.shadow.camera.near = 1
+directionalLight.shadow.camera.far = 20
+
+ghost1.shadow.mapSize.width = 256
+ghost1.shadow.mapSize.height = 256
+ghost1.shadow.camera.far = 10
+
+ghost2.shadow.mapSize.width = 256
+ghost2.shadow.mapSize.height = 256
+ghost2.shadow.camera.far = 10
+
+ghost3.shadow.mapSize.width = 256
+ghost3.shadow.mapSize.height = 256
+ghost3.shadow.camera.far = 10
 
 // Animation/orbit controls
 const controls = new OrbitControls(camera, canvas)
