@@ -269,7 +269,7 @@ window.addEventListener('resize', () => {
 const camera = new THREE.PerspectiveCamera(45, sizes.width / sizes.height, 0.1, 100)
 camera.position.x = 4
 camera.position.y = 2
-camera.position.z = 12
+camera.position.z = 9
 scene.add(camera)
 
 // Renderer
@@ -326,6 +326,9 @@ sky.material.uniforms['rayleigh'].value = 3
 sky.material.uniforms['mieCoefficient'].value = 0.1
 sky.material.uniforms['mieDirectionalG'].value = 0.95
 sky.material.uniforms['sunPosition'].value.set(0.3, -0.038, -0.95)
+
+// Fog
+scene.fog = new THREE.FogExp2('#02343f', 0.1)
 
 // Animation/orbit controls
 const controls = new OrbitControls(camera, canvas)
