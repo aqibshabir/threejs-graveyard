@@ -86,6 +86,16 @@ const doorRoughnessTexture = textureLoader.load('./door/roughness.webp')
 
 doorColorTexture.colorSpace = THREE.SRGBColorSpace
 
+// Tree Textures
+const treeColorTexture = textureLoader.load('./tree/pine_bark_1k/pine_bark_diff_1k.webp')
+const treeARMTexture = textureLoader.load('./tree/pine_bark_1k/pine_bark_arm_1k.webp')
+const treeNormalTexture = textureLoader.load('./tree/pine_bark_1k/pine_bark_nor_gl_1k.webp')
+
+// random number function
+const getRandomNumber = (min, max) => {
+  return Math.random() * (max - min) + min
+}
+
 // Meshes
 
 // Floor
@@ -178,22 +188,22 @@ const bushMaterial = new THREE.MeshStandardMaterial({
 
 const bush1 = new THREE.Mesh(bushGeometry, bushMaterial)
 bush1.scale.set(0.5,0.5,0.5)
-bush1.position.set(0.8, 0.2, 2.15)
+bush1.position.set(1.1, 0.1, 2.3)
 bush1.rotation.x = - 0.75
 
 const bush2 = new THREE.Mesh(bushGeometry, bushMaterial)
 bush2.scale.set(0.25,0.25,0.25)
-bush2.position.set(1.4, 0.1, 2.15)
+bush2.position.set(1.7, 0.1, 2.3)
 bush2.rotation.x = - 0.75
 
 const bush3 = new THREE.Mesh(bushGeometry, bushMaterial)
 bush3.scale.set(0.4,0.4,0.4)
-bush3.position.set(-0.8, 0.1, 2.15)
+bush3.position.set(-1, 0.1, 2.15)
 bush3.rotation.x = - 0.75
 
 const bush4 = new THREE.Mesh(bushGeometry, bushMaterial)
-bush4.scale.set(0.15,0.15,0.15)
-bush4.position.set(-1.2, 0.05, 2.35)
+bush4.scale.set(0.2,0.2,0.2)
+bush4.position.set(-1.5, 0.1, 2.15)
 bush4.rotation.x = - 0.75
 
 house.add(bush1, bush2, bush3, bush4)
@@ -225,6 +235,80 @@ for(let i = 0; i < 30; i++) {
   grave.rotation.y = (Math.random() - 0.5) * 0.4 
   grave.rotation.z = (Math.random() - 0.5) * 0.4 
   graves.add(grave)
+}
+
+// Trees
+const trees = new THREE.Group()
+trees.position.y = 1.8
+scene.add(trees)
+
+const treeMaterial = new THREE.MeshStandardMaterial({
+  map: treeColorTexture,
+  aoMap: treeARMTexture,
+  roughnessMap: treeARMTexture,
+  metalnessMap: treeARMTexture,
+  normalMap: treeNormalTexture
+})
+
+for(let i = 0; i < 8; i++) {
+  const angle = Math.random() * Math.PI * 3
+  const radius = 4 + Math.random() * 4
+  const x = Math.sin(angle) * radius
+  const z = Math.cos(angle) * radius 
+
+  const tree = new THREE.Group()
+
+ const randomTreeRadius = getRandomNumber(0.15, 0.325)
+ const randomTreeHeight = getRandomNumber(3.5, 5)  
+
+
+  const treeRoot = new THREE.Mesh(
+    new THREE.ConeGeometry(randomTreeRadius,randomTreeHeight,5),
+    treeMaterial)
+  tree.add(treeRoot)
+  
+  const treeNode1 = new THREE.Mesh(
+    new THREE.ConeGeometry(0.1,1.5,3),
+    treeMaterial)
+    
+  treeNode1.position.x = - 0.5
+  treeNode1.rotation.z = Math.PI / 4
+  tree.add(treeNode1)
+  
+  const treeNode2 = new THREE.Mesh(
+    new THREE.ConeGeometry(0.05,1,3),
+    treeMaterial)
+    
+  treeNode2.position.x = 0.5
+  treeNode2.position.y = 0.25
+  treeNode2.rotation.z = - (Math.PI / 2.5)
+  tree.add(treeNode2)
+  
+  const treeNode3 = new THREE.Mesh(
+    new THREE.ConeGeometry(0.04,0.5,3),
+    treeMaterial)
+
+  treeNode3.position.x = - 0.77
+  treeNode3.position.y = 0.1
+  treeNode3.rotation.z = Math.PI / 2.5
+  tree.add(treeNode3)
+  
+  const treeNode4 = new THREE.Mesh(
+    new THREE.ConeGeometry(0.03,0.6,3),
+    treeMaterial)
+
+  treeNode4.position.x = - 0.15
+  treeNode4.position.y = 0
+  treeNode4.rotation.z = Math.PI / 6
+  tree.add(treeNode4)
+
+  tree.position.x = x
+  tree.position.z = z
+  tree.rotation.y = (Math.random() - 0.5) * 8
+  tree.rotation.x = (Math.random() - 0.5) * 0.2
+  tree.rotation.z = (Math.random() - 0.5) * 0.3
+
+  trees.add(tree)
 }
 
 // Lighting
@@ -268,9 +352,9 @@ window.addEventListener('resize', () => {
 })
 
 const camera = new THREE.PerspectiveCamera(45, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = 3
+camera.position.x = 5
 camera.position.y = 1
-camera.position.z = 10
+camera.position.z = 11
 scene.add(camera)
 
 // Renderer
@@ -289,11 +373,17 @@ ghost3.castShadow = true
 walls.castShadow = true
 walls.receiveShadow = true
 roof.castShadow = true
+roof.receiveShadow = true
 floor.receiveShadow = true
 
 for(const grave of graves.children) {
   grave.castShadow = true
   grave.receiveShadow = true
+}
+
+for(const tree of trees.children){
+  tree.children[0].castShadow = true
+  tree.children[0].receiveShadow = true
 }
 
 directionalLight.shadow.mapSize.width = 256
@@ -329,7 +419,7 @@ sky.material.uniforms['mieDirectionalG'].value = 0.95
 sky.material.uniforms['sunPosition'].value.set(0.3, -0.038, -0.95)
 
 // Fog
-scene.fog = new THREE.FogExp2('#02343f', 0.1)
+scene.fog = new THREE.FogExp2('#02343f', 0.12)
 
 // Animation/orbit controls
 const controls = new OrbitControls(camera, canvas)
