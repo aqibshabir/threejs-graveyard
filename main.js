@@ -100,6 +100,7 @@ const floor = new THREE.Mesh(
     metalnessMap: floorARMTexture,
     normalMap: floorNormalTexture,
     displacementMap: floorDisplacementTexture,
+    side: THREE.DoubleSide,
     displacementScale: 0.3,
     displacementBias: - 0.179
   })
@@ -267,9 +268,9 @@ window.addEventListener('resize', () => {
 })
 
 const camera = new THREE.PerspectiveCamera(45, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = 4
-camera.position.y = 2
-camera.position.z = 9
+camera.position.x = 3
+camera.position.y = 1
+camera.position.z = 10
 scene.add(camera)
 
 // Renderer
